@@ -35,9 +35,18 @@ function _oauth_common_admin_settings_validate($form, $form_state) {
  */
 function oauth_common_list_context($js = NULL) {
   $header = array(
-    array('data' => t('Title'),      'class' => 'oauth-common-contexts-title'),
-    array('data' => t('Storage'),    'class' => 'oauth-common-contexts-storage'),
-    array('data' => t('Operations'), 'class' => 'oauth-common-contexts-operations'),
+    array(
+      'data' => t('Title'),
+      'class' => 'oauth-common-contexts-title',
+    ),
+    array(
+      'data' => t('Storage'),
+      'class' => 'oauth-common-contexts-storage',
+    ),
+    array(
+      'data' => t('Operations'),
+      'class' => 'oauth-common-contexts-operations',
+    ),
   );
 
   $contexts = oauth_common_context_load_all();
@@ -53,37 +62,37 @@ function oauth_common_list_context($js = NULL) {
     if (empty($context->disabled)) {
       $operations[] = array(
         'title' => t('Edit'),
-        'href'  => 'admin/settings/oauth/' . $context->name . '/edit',
+        'href' => 'admin/config/services/oauth/' . $context->name . '/edit',
       );
       $operations[] = array(
         'title' => t('Export'),
-        'href'  => 'admin/settings/oauth/' . $context->name . '/export',
+        'href' => 'admin/config/services/oauth/' . $context->name . '/export',
       );
     }
 
     if ($context->export_type == (EXPORT_IN_CODE | EXPORT_IN_DATABASE)) {
       $operations[] = array(
         'title' => t('Revert'),
-        'href'  => 'admin/settings/oauth/' . $context->name . '/delete',
+        'href' => 'admin/config/services/oauth/' . $context->name . '/delete',
       );
     }
     elseif ($context->export_type != EXPORT_IN_CODE) {
       $operations[] = array(
         'title' => t('Delete'),
-        'href'  => 'admin/settings/oauth/' . $context->name . '/delete',
+        'href' => 'admin/config/services/oauth/' . $context->name . '/delete',
       );
     }
     elseif (empty($context->disabled)) {
       $operations[] = array(
         'title' => t('Disable'),
-        'href'  => 'admin/settings/oauth/' . $context->name . '/disable',
+        'href' => 'admin/config/services/oauth/' . $context->name . '/disable',
         'query' => drupal_get_destination(),
       );
     }
     else {
       $operations[] = array(
         'title' => t('Enable'),
-        'href'  => 'admin/settings/oauth/' . $context->name . '/enable',
+        'href' => 'admin/config/services/oauth/' . $context->name . '/enable',
         'query' => drupal_get_destination(),
       );
     }
@@ -91,23 +100,23 @@ function oauth_common_list_context($js = NULL) {
     $rows[$context->name] = array(
       'data' => array(
         'title' => array(
-          'data'  => check_plain($context->title),
-          'class' => 'oauth-common-contexts-title',
+          'data' => check_plain($context->title),
+          'class' => array('oauth-common-contexts-title'),
         ),
         'storage' => array(
-          'data'  => ($context->export_type == EXPORT_IN_CODE) ? t('In code') : t('In database'),
-          'class' => 'oauth-common-contexts-storage',
+          'data' => ($context->export_type == EXPORT_IN_CODE) ? t('In code') : t('In database'),
+          'class' => array('oauth-common-contexts-storage'),
         ),
         'operations' => array(
-          'data'  => theme('links', $operations),
-          'class' => 'oauth-common-contexts-operations',
+          'data' => theme('links', array('links' => $operations)),
+          'class' => array('oauth-common-contexts-operations'),
         ),
       ),
-      'class' => 'oauth-common-contexts-' . $context->name . (!empty($context->disabled) ? ' oauth-common-contexts-disabled' : ''),
+      'class' => array('oauth-common-contexts-' . $context->name . (!empty($context->disabled) ? ' oauth-common-contexts-disabled' : '')),
     );
   }
 
-  $table = theme('table', $header, $rows, array('id' => 'oauth-common-list-contexts'));
+  $table = theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'oauth-common-list-contexts')));
 
   return $table;
 }
@@ -140,7 +149,7 @@ function oauth_common_edit_context($context) {
     $context = oauth_common_context_load($context);
   }
   if ($context && !empty($context->title)) {
-    drupal_set_title(check_plain($context->title));
+    drupal_set_title($context->title);
   }
   return drupal_get_form('oauth_common_edit_form_context', $context);
 }
@@ -148,38 +157,38 @@ function oauth_common_edit_context($context) {
 /**
  * Form to edit the settings of an context.
  */
-function oauth_common_edit_form_context(&$form_state, $context) {
+function oauth_common_edit_form_context($form, &$form_state, $context) {
   $form = array(
     '#pre_render' => array('_oauth_common_add_admin_css'),
   );
 
   $form['cid'] = array(
-    '#type'  => 'value',
+    '#type' => 'value',
     '#value' => isset($context->cid) ? $context->cid : '',
   );
 
   $form['context_object'] = array(
-    '#type'  => 'value',
+    '#type' => 'value',
     '#value' => $context,
   );
 
   $form['name'] = array(
-    '#type'          => 'textfield',
-    '#size'          => 24,
-    '#maxlength'     => 32,
+    '#type' => 'textfield',
+    '#size' => 24,
+    '#maxlength' => 32,
     '#default_value' => $context->name,
-    '#title'         => t('Context name'),
-    '#description'   => t('A unique name used to identify this preset internally. It must be only be alpha characters and underscores. No spaces, numbers or uppercase characters.'),
-    '#required'      => TRUE,
+    '#title' => t('Context name'),
+    '#description' => t('A unique name used to identify this preset internally. It must be only be alpha characters and underscores. No spaces, numbers or uppercase characters.'),
+    '#required' => TRUE,
   );
 
   $form['title'] = array(
-    '#type'          => 'textfield',
-    '#size'          => 24,
-    '#maxlength'     => 100,
+    '#type' => 'textfield',
+    '#size' => 24,
+    '#maxlength' => 100,
     '#default_value' => $context->title,
-    '#title'         => t('Context title'),
-    '#required'      => TRUE,
+    '#title' => t('Context title'),
+    '#required' => TRUE,
   );
 
   $sign_methods = array(
@@ -202,7 +211,7 @@ function oauth_common_edit_form_context(&$form_state, $context) {
       '#default_value' => !empty($context->authorization_options['signature_methods']) ?
          $context->authorization_options['signature_methods'] :
          array('HMAC-SHA1', 'HMAC-SHA256', 'HMAC-SHA384', 'HMAC-SHA512'),
-    )
+    ),
   );
 
   $form['authorization_options'] = array(
@@ -219,21 +228,21 @@ function oauth_common_edit_form_context(&$form_state, $context) {
     '#description' => t('The title of the authorization page.'),
     '#size' => 40,
     '#maxlength' => 255,
-    '#default_value' => $context->authorization_options['page_title'],
+    '#default_value' => !empty($context->authorization_options['page_title']) ? $context->authorization_options['page_title'] : '',
   );
 
   $form['authorization_options']['message'] = array(
     '#type' => 'textarea',
     '#title' => t('Message'),
     '#description' => t('The message shown to the user when authorizing.'),
-    '#default_value' => $context->authorization_options['message'],
+    '#default_value' => !empty($context->authorization_options['message']) ? $context->authorization_options['message'] : '',
   );
 
   $form['authorization_options']['warning'] = array(
     '#type' => 'textarea',
     '#title' => t('Warning'),
     '#description' => t('The warning shown to the user when authorizing.'),
-    '#default_value' => $context->authorization_options['warning'],
+    '#default_value' => !empty($context->authorization_options['warning']) ? $context->authorization_options['message'] : '',
   );
 
   $form['authorization_options']['deny_access_title'] = array(
@@ -242,7 +251,7 @@ function oauth_common_edit_form_context(&$form_state, $context) {
     '#description' => t('The title of deny access link.'),
     '#size' => 40,
     '#maxlength' => 255,
-    '#default_value' => $context->authorization_options['deny_access_title'],
+    '#default_value' => !empty($context->authorization_options['deny_access_title']) ? $context->authorization_options['deny_access_title'] : '',
   );
 
   $form['authorization_options']['grant_access_title'] = array(
@@ -251,7 +260,7 @@ function oauth_common_edit_form_context(&$form_state, $context) {
     '#description' => t('The title of grant access button.'),
     '#size' => 40,
     '#maxlength' => 255,
-    '#default_value' => $context->authorization_options['grant_access_title'],
+    '#default_value' => !empty($context->authorization_options['grant_access_title']) ? $context->authorization_options['grant_access_title'] : '',
   );
 
   $form['authorization_options']['access_token_lifetime'] = array(
@@ -284,10 +293,10 @@ function oauth_common_edit_form_context(&$form_state, $context) {
       '#value' => t('Add authorization level'),
       '#weight' => 10,
       '#ahah' => array(
-        'path' => 'admin/settings/oauth/ahah/add-auth-level',
+        'path' => 'admin/config/services/oauth/ahah/add-auth-level',
         'wrapper' => 'auth-level-wrapper',
         'method' => 'append',
-      )
+      ),
     ),
   );
 
@@ -308,7 +317,7 @@ function oauth_common_edit_form_context(&$form_state, $context) {
   );
 
   $form['submit'] = array(
-    '#type'  => 'submit',
+    '#type' => 'submit',
     '#value' => t('Save'),
   );
 
@@ -403,7 +412,7 @@ function oauth_common_ahah_add_auth_level() {
   $level = form_builder('oauth_common_ahah_add_auth_level', $level, $form_state);
   $output = drupal_render($level);
 
-  print drupal_to_js(array(
+  print drupal_json_encode(array(
     'status' => TRUE,
     'data' => $output,
   ));
@@ -415,21 +424,21 @@ function oauth_common_ahah_add_auth_level() {
  */
 function oauth_common_edit_form_context_validate(&$form, &$form_state) {
   $values = $form_state['values'];
-
+  
   // Test uniqueness of name:
   if (preg_match("/[^A-Za-z0-9_]/", $values['name'])) {
     form_error($form['name'], t('Context name must be alphanumeric or underscores only.'));
   }
   else if (!empty($values['name'])) {
-    $query = "SELECT cid FROM {oauth_common_context} WHERE name = '%s'";
-    $args  = array(
-      ':name' => $values['name'],
-    );
+    $query = db_select('oauth_common_context');
+    $query
+      ->condition('name', $values['name'], '=')
+      ->fields('oauth_common_context', array('cid'));
     if (!empty($values['cid']) && is_numeric($values['cid'])) {
-      $query .= ' AND cid != %d';
-      $args[':cid'] = $values['cid'];
+      $query->condition('cid', $values['cid'], '<>');
     }
-    if (db_result(db_query($query, $args))) {
+    $result = $query->execute();
+    if ($result->fetchField(0)) {
       form_error($form['name'], t('Context name must be unique.'));
     }
   }
@@ -546,7 +555,7 @@ function oauth_common_edit_form_context_submit($form, &$form_state) {
     drupal_set_message(t('Your changes have been saved.'));
   }
 
-  $form_state['redirect'] = 'admin/settings/oauth';
+  $form_state['redirect'] = 'admin/config/services/oauth';
 }
 
 /**
@@ -568,11 +577,17 @@ function oauth_common_delete_confirm_context(&$form_state, $context) {
     drupal_not_found();
     die;
   }
-  $form['context'] = array('#type' => 'value', '#value' => $context->name);
-  $form['cid']      = array('#type' => 'value', '#value' => $context->cid);
+  $form['context'] = array(
+    '#type' => 'value',
+    '#value' => $context->name,
+  );
+  $form['cid']      = array(
+    '#type' => 'value',
+    '#value' => $context->cid,
+  );
   return confirm_form($form,
     $title,
-    !empty($_GET['destination']) ? $_GET['destination'] : 'admin/settings/oauth',
+    !empty($_GET['destination']) ? $_GET['destination'] : 'admin/config/services/oauth',
     t('This action cannot be undone.'),
     $submit, t('Cancel')
   );
@@ -585,7 +600,7 @@ function oauth_common_delete_confirm_context_submit($form, &$form_state) {
   $context = oauth_common_context_load($form_state['values']['context']);
   if ($context->cid == $form_state['values']['cid']) {
     oauth_common_context_delete($context);
-    $form_state['redirect'] = 'admin/settings/oauth';
+    $form_state['redirect'] = 'admin/config/services/oauth';
   }
 }
 
@@ -596,15 +611,15 @@ function oauth_common_export_context(&$form_state, $context) {
   if (!is_object($context)) {
     $context = oauth_common_context_load($context);
   }
-  drupal_set_title(check_plain($context->title));
+  drupal_set_title($context->title);
   $code = oauth_common_context_export($context);
 
   $lines = substr_count($code, "\n") + 4;
   $form['code'] = array(
-    '#type'          => 'textarea',
-    '#title'         => $context->title,
+    '#type' => 'textarea',
+    '#title' => $context->title,
     '#default_value' => $code,
-    '#rows'          => $lines,
+    '#rows' => $lines,
   );
 
   return $form;

@@ -98,11 +98,11 @@ class DrupalOAuthClient {
     }
 
     $options += array(
-        'params' => array(),
-        'realm' => NULL,
-        'get' => FALSE,
-        'callback' => NULL,
-      );
+      'params' => array(),
+      'realm' => NULL,
+      'get' => FALSE,
+      'callback' => NULL,
+    );
 
     if (empty($endpoint)) {
       if (!empty($this->consumer->configuration['request_endpoint'])) {
@@ -117,10 +117,10 @@ class DrupalOAuthClient {
     }
 
     $response = $this->get($endpoint, array(
-        'params' => $options['params'],
-        'realm' => $options['realm'],
-        'get' => $options['get'],
-      ));
+      'params' => $options['params'],
+      'realm' => $options['realm'],
+      'get' => $options['get'],
+    ));
 
     $params = array();
     parse_str($response, $params);
@@ -134,7 +134,7 @@ class DrupalOAuthClient {
     }
 
     $this->requestToken = new DrupalOAuthToken($params['oauth_token'], $params['oauth_token_secret'], $this->consumer, array(
-      'type'    => OAUTH_COMMON_TOKEN_TYPE_REQUEST,
+      'type' => OAUTH_COMMON_TOKEN_TYPE_REQUEST,
       'version' => $this->version,
     ));
 
@@ -166,9 +166,9 @@ class DrupalOAuthClient {
    */
   public function getAuthorizationUrl($endpoint = NULL, $options = array()) {
     $options += array(
-        'params' => array(),
-        'callback' => NULL,
-      );
+      'params' => array(),
+      'callback' => NULL,
+    );
 
     if (empty($endpoint)) {
       if (!empty($this->consumer->configuration['authorization_endpoint'])) {
@@ -219,11 +219,11 @@ class DrupalOAuthClient {
     }
 
     $options += array(
-        'params' => array(),
-        'realm' => NULL,
-        'get' => FALSE,
-        'verifier' => NULL,
-      );
+      'params' => array(),
+      'realm' => NULL,
+      'get' => FALSE,
+      'verifier' => NULL,
+    );
 
     if (empty($endpoint)) {
       if (!empty($this->consumer->configuration['access_endpoint'])) {
@@ -238,11 +238,11 @@ class DrupalOAuthClient {
     }
 
     $response = $this->get($endpoint, array(
-        'token' => TRUE,
-        'params' => $options['params'],
-        'realm' => $options['realm'],
-        'get' => $options['get'],
-      ));
+      'token' => TRUE,
+      'params' => $options['params'],
+      'realm' => $options['realm'],
+      'get' => $options['get'],
+    ));
 
     $params = array();
     parse_str($response, $params);
@@ -288,11 +288,11 @@ class DrupalOAuthClient {
    */
   protected function get($path, $options = array()) {
     $options += array(
-        'token' => FALSE,
-        'params' => array(),
-        'realm' => NULL,
-        'get' => FALSE,
-      );
+      'token' => FALSE,
+      'params' => array(),
+      'realm' => NULL,
+      'get' => FALSE,
+    );
 
     if (empty($options['realm']) && !empty($this->consumer->configuration['authentication_realm'])) {
       $options['realm'] = $this->consumer->configuration['authentication_realm'];
@@ -362,7 +362,7 @@ class DrupalOAuthClient {
   protected function getAbsolutePath($path) {
     $protocols = array(
       'http',
-      'https'
+      'https',
     );
     $protocol = strpos($path, '://');
     $protocol = $protocol ? substr($path, 0, $protocol) : '';

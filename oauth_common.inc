@@ -9,10 +9,14 @@
  *  An array of consumer info
  */
 function oauth_common_user_consumers($uid) {
+  // TODO Please convert this statement to the D7 database API syntax.
   $result = db_query($query = 'SELECT c.secret, c.configuration, pc.*
     FROM {oauth_common_consumer} c
     INNER JOIN {oauth_common_provider_consumer} pc ON pc.csid = c.csid
-    WHERE pc.uid = %d' . $where, array(':uid' => $uid));
+    WHERE pc.uid = :uid' . $where, 
+            array(
+              ':uid' => $uid
+            ));
 
   $consumers = array();
   while ($consumer = DrupalOAuthConsumer::fromResult($result)) {
@@ -31,10 +35,11 @@ function oauth_common_user_consumers($uid) {
  *  An array of consumer info
  */
 function oauth_common_user_access_tokens($uid) {
-  $result = db_query("SELECT * FROM {oauth_common_token} WHERE uid = %d AND type = '%d'", array(
-    ':uid' => $uid,
-    ':type' => OAUTH_COMMON_TOKEN_TYPE_ACCESS,
-  ));
+  $result = db_query("SELECT * FROM {oauth_common_token} WHERE uid = :uid AND type = :type", 
+            array(
+                ':uid' => $uid,
+                ':type' => OAUTH_COMMON_TOKEN_TYPE_ACCESS,
+            ));
   $tokens = array();
   while ($token = DrupalOAuthToken::fromResult($result)) {
     $tokens[] = $token;
@@ -80,32 +85,6 @@ function oauth_common_verify_request() {
     }
   }
   return array(FALSE, NULL, NULL);
-}
-
-/**
- * AHAH callback to retrieve the secret of OAuth objects.
- *
- * @param object $object
- * @return void
- */
-function oauth_common_ahah_secret($object) {
-  $cached_form_state = array();
-  $form = form_get_cache($_POST['form_build_id'], $cached_form_state);
-  form_set_cache($_POST['form_build_id'], $form, $cached_form_state);
-
-  $form_state = array('submitted' => FALSE);
-  $secret = array(
-    '#prefix' => '',
-    '#value' => $object->secret,
-  ) + $form['secret'];
-  $secret = form_builder('oauth_common_ahah_secret', $secret, $form_state);
-  $output = drupal_render($secret);
-
-  print drupal_to_js(array(
-    'status' => TRUE,
-    'data' => $output,
-  ));
-  exit;
 }
 
 function _oauth_common_verify_body_hash($req) {

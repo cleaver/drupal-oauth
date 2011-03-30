@@ -12,7 +12,7 @@
 function _oauth_common_update_6003() {
   $ret = array();
 
-  db_add_field($ret, 'oauth_common_token', 'provider_token', array(
+  db_add_field('oauth_common_token', 'provider_token', array(
     'description' => t('Whether this is a consumer or a provider token'),
     'type' => 'int',
     'size' => 'tiny',
@@ -21,7 +21,7 @@ function _oauth_common_update_6003() {
     'default' => 1,
   ));
 
-  db_add_field($ret, 'oauth_common_consumer', 'provider_consumer', array(
+  db_add_field('oauth_common_consumer', 'provider_consumer', array(
     'description' => t('Whether this is a provider consumer or a consumer consumer'),
     'type' => 'int',
     'size' => 'tiny',

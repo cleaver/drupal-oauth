@@ -10,26 +10,38 @@ function oauth_common_page_user_consumers($account) {
 
   $ci = oauth_common_user_consumers($account->uid);
   $header = array(
-    array('data' => t('Name'),       'class' => 'oauth-common-consumer-name'),
-    array('data' => t('Key'),        'class' => 'oauth-common-consumer-key'),
-    array('data' => t('Created'),    'class' => 'oauth-common-consumer-created'),
-    array('data' => t('Operations'), 'class' => 'oauth-common-consumer-operations'),
+    array(
+      'data' => t('Name'),
+      'class' => array('oauth-common-consumer-name'),
+    ),
+    array(
+      'data' => t('Key'),
+      'class' => array('oauth-common-consumer-key'),
+    ),
+    array(
+      'data' => t('Created'),
+      'class' => array('oauth-common-consumer-created'),
+    ),
+    array(
+      'data' => t('Operations'),
+      'class' => array('oauth-common-consumer-operations'),
+    ),
   );
   $rows = array();
 
   foreach ($ci as $consumer) {
     $data = array(
       'name' => array(
-        'data'  => $consumer->name,
-        'class' => 'oauth-common-consumer-name',
+        'data' => $consumer->name,
+        'class' => array('oauth-common-consumer-name'),
       ),
       'key' => array(
-        'data'  => substr($consumer->key, 0, 6) . '...',
-        'class' => 'oauth-common-consumer-key',
+        'data' => substr($consumer->key, 0, 6) . '...',
+        'class' => array('oauth-common-consumer-key'),
       ),
       'created' => array(
-        'data'  => format_date($consumer->created),
-        'class' => 'oauth-common-consumer-created',
+        'data' => format_date($consumer->created),
+        'class' => array('oauth-common-consumer-created'),
       ),
     );
     $operations = array();
@@ -37,26 +49,26 @@ function oauth_common_page_user_consumers($account) {
     if (oauth_common_can_edit_consumer($consumer)) {
       $operations[] = array(
         'title' => t('Edit'),
-        'href'  => sprintf('user/%d/oauth/consumer/%s', $account->uid, $consumer->csid),
+        'href' => sprintf('user/%d/oauth/consumer/%s', $account->uid, $consumer->csid),
       );
       $operations[] = array(
         'title' => t('Delete'),
-        'href'  => sprintf('user/%d/oauth/consumer/%s', $account->uid, $consumer->csid) . '/delete',
+        'href' => sprintf('user/%d/oauth/consumer/%s', $account->uid, $consumer->csid) . '/delete',
       );
     }
 
     $rows[] = array(
       'data' => $data + array(
         'operations' => array(
-          'data'  => theme('links', $operations),
-          'class' => 'oauth-common-consumer-operations',
+          'data' => theme('links', array('links' => $operations)),
+          'class' => array('oauth-common-consumer-operations'),
         ),
       ),
-      'class' => 'oauth-common-consumer',
+      'class' => array('oauth-common-consumer'),
     );
   }
 
-  $table = theme('table', $header, $rows, array('id' => 'oauth-common-list-consumers'));
+  $table = theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'oauth-common-list-consumers')));
 
   return $table;
 }
@@ -83,7 +95,7 @@ function oauth_common_edit_consumer($consumer) {
 /**
  * The consumer form that is shared by the add and edit page.
  */
-function oauth_common_form_consumer(&$form_state, $consumer) {
+function oauth_common_form_consumer($form, &$form_state, $consumer) {
   $form = array();
 
   $form['consumer_object'] = array(
@@ -133,23 +145,24 @@ function oauth_common_form_consumer(&$form_state, $consumer) {
     $form['key'] = array(
       '#type' => 'item',
       '#title' => t('Key'),
-      '#value' => $consumer->key,
+      '#markup' => $consumer->key,
     );
 
     $form['secret'] = array(
       '#type' => 'item',
       '#prefix' => '<div id="consumer-secret-wrapper">',
       '#title' => t('Secret'),
-      '#value' => substr($consumer->secret, 0, 6) . '...',
+      '#markup' => substr($consumer->secret, 0, 6) . '...',
     );
 
     $form['show_secret'] = array(
       '#type' => 'button',
       '#value' => t('Show secret'),
-      '#ahah' => array(
-        'path' => "user/{$consumer->uid}/oauth/consumer/{$consumer->csid}/ahah/secret",
+      '#ajax' => array(
+        'callback' => 'oauth_common_form_consumer_ajax_secret',
         'wrapper' => 'consumer-secret-wrapper',
         'method' => 'replace',
+        'effect' => 'fade',
       ),
       '#suffix' => '</div>',
     );
@@ -161,6 +174,20 @@ function oauth_common_form_consumer(&$form_state, $consumer) {
   );
 
   return $form;
+}
+
+/**
+ * AJAX callback to retrieve the secret of OAuth objects.
+ *
+ * @param object $object
+ * @return void
+ */
+function oauth_common_form_consumer_ajax_secret($form, $form_state) {
+  $consumer = $form_state['values']['consumer_object'];
+  
+  $form['secret']['#markup'] = $consumer->secret;
+  
+  return $form['secret'];
 }
 
 /**
